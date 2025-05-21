@@ -17,9 +17,7 @@ This project presents a cloud security posture monitoring (CSPM) solution by int
 ---
 
 ## 3. Architecture Diagram
-
-> *(Insert diagram here showing AWS → EventBridge → CloudWatch → Splunk → Dashboards. Optionally, queries and KV Store connections can go on a separate page.)*
-
+![Untitled Diagram drawio](https://github.com/user-attachments/assets/1b66c95f-736c-493b-87e2-26553c654110)
 ---
 
 ## 4. Setup and Configuration

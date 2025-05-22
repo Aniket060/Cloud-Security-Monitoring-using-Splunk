@@ -81,7 +81,7 @@ Steps:
 
 To classify events, use **KV Store-backed lookups**:
 
-- Go to `Settings > Knowledge > Lookups`  
+- Go to `Settings > Knowledge > Lookups > Lookup definitions > New Lookup Definition
 - Create lookup tables for each severity level:  
   - `low_severity_lookup`  
   - `medium_severity_lookup`  
@@ -89,17 +89,47 @@ To classify events, use **KV Store-backed lookups**:
   - `critical_severity_lookup`  
 - Set field names and permissions appropriately
 
-> Insert screenshots for lookup creation and permissions setup.
+![image](https://github.com/user-attachments/assets/95386b27-cb32-43a3-9971-9988fdb81d6a)
+![image](https://github.com/user-attachments/assets/e85a0598-8e1f-4919-bd5e-e1fbb752ee60)
+Configure appropriate permissions. For project testing purpose, following permissions were configured. However, it is recommended to give only necessary access. 
+![image](https://github.com/user-attachments/assets/da0d3822-1034-4f47-9d8b-3263b536f44d)
+![image](https://github.com/user-attachments/assets/dcfd939e-aa96-4845-a412-8a47187a5d90)
+
+Now in order to finish the setup of KV Store Lookups, locate to /opt/splunk/etc/apps/<your_splunk_app_name>/local, and edit the collections.conf file by just mentioning the Lookups names in square brackets. 
+![image](https://github.com/user-attachments/assets/bc5e57e8-fa45-49f7-bc4c-2aa0f89be4e5)
+
 
 #### ii. Creating Scheduled Reports
 
 To populate the lookups:
+1. Go to Search & Reporting tab, enter SPL query to extract necessary data to populate Lookups. Below is an example of a SPL Query to extract data about unencrypted volumes and feed it into the Lookup. You can customize the query based on your requirements. 
+index="security_hub_2"
+| spath detail.findings{}.ProductFields.RelatedAWSResources:0/name output=config_rule
+| search config_rule IN (
+    "securityhub-encrypted-volumes-3504b60a"
+)
+| spath detail.findings{}.Workflow.Status output=workflowstatus
+| spath detail.findings{}.RecordState output=recordstate
+| spath detail.findings{}.Resources{}.Id output=resourceId |spath detail.findings{}.Resources{}.Type
+output=resourceType
+| eval status=case(
+    workflowstatus="NEW" AND recordstate="ACTIVE", "active",
+    workflowstatus="RESOLVED" AND (recordstate="ACTIVE" OR recordstate="ARCHIVED"), "closed",
+    workflowstatus="NEW" AND recordstate="ARCHIVED", "closed",
+    true(), "unknown"
+)
+| search status="active" OR status="closed"
+| eval reason=case(
+    config_rule="securityhub-encrypted-volumes-3504b60a", "unencrypted-ebs"
+)
+| eval _time=now()
+| sort 0 -_time
+| dedup resourceId
+| table resourceId,resourceType,status, reason,_time
+| outputlookup HighVuln
 
-1. Write SPL queries to extract misconfiguration data  
-2. View result statistics and confirm expected structure  
-3. Save the search as a **report**, then **schedule** it (e.g., hourly/daily)
-
-> Add example SPL queries and screenshots of the process.
+Run the query and check the output in Statistics tab. The KV Store Lookups are now updated with the data. 
+2. Save the search as a **report**, then go to Reports and **schedule** it (e.g., hourly/daily). 
 
 ---
 
@@ -110,18 +140,17 @@ Dashboards help **visualize the security posture** and simplify monitoring.
 #### i. Creating the Dashboard
 
 - Go to **Dashboard**  
-- Give it a name and choose layout type  
-- Add panels using preferred chart types (e.g., *Pie*, *Bar*)
+- Give it a name and choose layout type
+  ![image](https://github.com/user-attachments/assets/272d91c3-a45d-4764-bab3-81b17157d8f0)
 
-#### ii. Configuring Dashboard Panels
+- Select Add Chart and choose the type of visualisations (Line, Bar, Pie, etc).
+- In the configuration tab on the right side, select Set up Primary Data Source > Create Search , enter appropriate SPL query based on which attribute is to be visualised. In this project, the status count of misconfigurations of each severity is to be visualised. Hence, the following query was used,
+| inputlookup HighVuln
+| stats count by status
+Select Apply and Close and then click on Save. Now you shall be able to view the visualisation. 
+Do the same for each severity category or any other metric of your choice. 
 
-- Select a panel, choose *Create Search*  
-- Use SPL queries to fetch data from KV Store lookups  
-- Save the panel and repeat for:
-  - *High*, *Medium*, *Low*, and *Critical* Severity
-  - *Resource Types*
-
-> Include example queries and screenshots of the final dashboards.
+![Cloud Security Posture_2025-05-22 at 11 46 25+0530_Splunk](https://github.com/user-attachments/assets/c67e1e12-4029-4672-8bff-533030ca0d6c)
 
 ---
 

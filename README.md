@@ -89,12 +89,14 @@ To classify events, use **KV Store-backed lookups**:
 
 ![image](https://github.com/user-attachments/assets/95386b27-cb32-43a3-9971-9988fdb81d6a)
 ![image](https://github.com/user-attachments/assets/e85a0598-8e1f-4919-bd5e-e1fbb752ee60)
-Configure appropriate permissions. For project testing purpose, following permissions were configured. However, it is recommended to give only necessary access. 
-![image](https://github.com/user-attachments/assets/da0d3822-1034-4f47-9d8b-3263b536f44d)
+![image](https://github.com/user-attachments/assets/7b3b9403-c197-40fc-ab53-b7bb93313f8d)
+
+Configure appropriate permissions. For project testing purpose, following permissions were configured. However, it is recommended to give only necessary access.
+
 ![image](https://github.com/user-attachments/assets/dcfd939e-aa96-4845-a412-8a47187a5d90)
 
 - Now in order to finish the setup of KV Store Lookups, locate to /opt/splunk/etc/apps/<your_splunk_app_name>/local, and edit the collections.conf file by just mentioning the Lookups names in square brackets. 
-![image](https://github.com/user-attachments/assets/bc5e57e8-fa45-49f7-bc4c-2aa0f89be4e5)
+![image](https://github.com/user-attachments/assets/5ee48b4a-fcfc-4a0c-b725-a7ad2e2e4a5c)
 
 #### ii. Creating Scheduled Reports
 
@@ -148,7 +150,8 @@ Dashboards help **visualize the security posture** and simplify monitoring.
 Select Apply and Close and then click on Save. Now you shall be able to view the visualisation. 
 Do the same for each severity category or any other metric of your choice. 
 
-![Cloud Security Posture_2025-05-22 at 11 46 25+0530_Splunk](https://github.com/user-attachments/assets/c67e1e12-4029-4672-8bff-533030ca0d6c)
+![image](https://github.com/user-attachments/assets/decee621-df6e-4227-8705-857e1107cbf3)
+
 
 ---
 
